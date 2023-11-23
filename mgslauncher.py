@@ -5,9 +5,12 @@ import os
 
 # following method runs the exacutable provided at the exe_path
 def run_game(window, exe_path):
-    os.system("start " + exe_path)
-    window.destroy()
+    if exe_path == "": return           # exit method if no path has been provided
 
+    os.system("start " + exe_path)      # open the game via console command
+    window.destroy()                    # destroy the window to close the launcher
+
+# enables or disables any given game button
 def enable_game(game_button, button_state):
     game_button["state"] = button_state.get()
 
@@ -30,7 +33,8 @@ def choose_path(game_path, game_button):
 
 def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
 
-    # fetching the variables from arguments
+    #   fetching the variables from arguments
+
     mgs1_button = mgs1_info[0]
     mgs2_button = mgs2_info[0]
     mgs3_button = mgs3_info[0]
@@ -45,8 +49,8 @@ def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
 
     popup = tk.Toplevel(window)
     popup.title("choose games and paths to their exe")
-    window_width = 400
-    window_height = 300
+    window_width = 600
+    window_height = 85
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
     x_cordinate = int((screen_width/2) - (window_width/2))
@@ -57,9 +61,14 @@ def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
 
 
     # initialize check buttons
-    mgs1_c_button = tk.Checkbutton(popup, text="mgs1", variable=has_mgs1, onvalue="normal", offvalue="disabled", command=lambda: enable_game(mgs1_button,has_mgs1))
-    mgs2_c_button = tk.Checkbutton(popup, text="mgs2", variable=has_mgs2, onvalue="normal", offvalue="disabled", command=lambda: enable_game(mgs2_button,has_mgs2))
-    mgs3_c_button = tk.Checkbutton(popup, text="mgs3", variable=has_mgs3, onvalue="normal", offvalue="disabled", command=lambda: enable_game(mgs3_button,has_mgs3))
+    mgs1_c_button = tk.Checkbutton(popup, text="MGS1", variable=has_mgs1, onvalue="normal", offvalue="disabled", 
+                                   command=lambda: enable_game(mgs1_button,has_mgs1))
+    
+    mgs2_c_button = tk.Checkbutton(popup, text="MGS2", variable=has_mgs2, onvalue="normal", offvalue="disabled", 
+                                   command=lambda: enable_game(mgs2_button,has_mgs2))
+    
+    mgs3_c_button = tk.Checkbutton(popup, text="MGS3", variable=has_mgs3, onvalue="normal", offvalue="disabled", 
+                                   command=lambda: enable_game(mgs3_button,has_mgs3))
 
 
     # initialize buttons for choosing path
@@ -68,13 +77,13 @@ def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
     mgs3_p_button = tk.Button(popup,text="Choose path for MGS3: ", command=lambda: choose_path(mgs3_path, mgs3_button))
 
 
-    mgs1_c_button.pack()
-    mgs2_c_button.pack()
-    mgs3_c_button.pack()
+    mgs1_c_button.place(x=5, y=5)
+    mgs2_c_button.place(x=5, y=30)
+    mgs3_c_button.place(x=5,y=55)
 
-    mgs1_p_button.pack()
-    mgs2_p_button.pack()
-    mgs3_p_button.pack()
+    mgs1_p_button.place(x=70,y=5)
+    mgs2_p_button.place(x=70,y=30)
+    mgs3_p_button.place(x=70,y=55)
 
 
 # window initialization

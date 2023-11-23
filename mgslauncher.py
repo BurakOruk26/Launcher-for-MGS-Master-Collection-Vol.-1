@@ -14,7 +14,18 @@ def run_game(window, exe_path):
 def enable_game(game_button, button_state):
     game_button["state"] = button_state.get()
 
-def choose_path(game_path, game_button):
+##################################
+
+###      ADD PATH SAVING       ###
+
+##################################
+
+def set_game_path(game_path_var, game_path, game_button, has_game):
+    game_path_var.set( game_path )
+    game_button["state"] = "normal" # enable the game button
+    has_game.set("normal")
+
+def choose_path(game_path_var, game_button, has_game, selection_popup):
     path=  fd.askopenfilename(filetypes=[("game executable", ".exe")])
     
     # following procedure is done because of Konami has named their exacutables in an amateurish way
@@ -28,8 +39,9 @@ def choose_path(game_path, game_button):
     # add the needed double quotes before and after the executable name
     path = before_last_slash + '\"' + after_last_slash + '\"'
 
-    game_path.set( path )
-    game_button["state"] = "normal" # enable the game button
+    set_game_path(game_path_var, path, game_button, has_game)
+
+    selection_popup.destroy()
 
 def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
 
@@ -75,13 +87,13 @@ def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
 
     # initialize buttons for choosing path
     mgs1_p_button = tk.Button(popup,text="Click to choose path for MGS1: ", bg="#8B2323", fg="white", font=("Helvatica", 8, "bold"),
-                              command=lambda: choose_path(mgs1_path, mgs1_button))
+                              command=lambda: choose_path(mgs1_path, mgs1_button, has_mgs1, popup))
     
     mgs2_p_button = tk.Button(popup,text="Click to choose path for MGS2: ", bg="#3D58AB", fg="white", font=("Helvatica", 8, "bold"),
-                              command=lambda: choose_path(mgs2_path, mgs2_button))
+                              command=lambda: choose_path(mgs2_path, mgs2_button, has_mgs2, popup))
     
     mgs3_p_button = tk.Button(popup,text="Click to choose path for MGS3: ", bg="#458B00", fg="white", font=("Helvatica", 8, "bold"),
-                              command=lambda: choose_path(mgs3_path, mgs3_button))
+                              command=lambda: choose_path(mgs3_path, mgs3_button, has_mgs3, popup))
 
 
     # initialize labels for showing current path
@@ -166,7 +178,9 @@ if mgs3_path.get() == "": mgs3_button["state"] = "disabled"
 
 
 # button for exiting the application
-close_button = tk.Button(window,text="EXIT", font=("Helvatica", 10, "bold"), bg="brown", foreground="white", borderwidth=0, command=lambda: window.destroy())
+close_button = tk.Button(window,text="EXIT", font=("Helvatica", 10, "bold"), bg="brown", foreground="white", borderwidth=0, 
+                         command=lambda: window.destroy())
+
 close_button.place(x=950,y=400)
 
 mgs1_info = [mgs1_button, has_mgs1, mgs1_path]
@@ -176,6 +190,7 @@ mgs3_info = [mgs3_button, has_mgs3, mgs3_path]
 # button for selecting directories for the games
 options = tk.Button(window,text="OPTIONS", font=("Helvatica", 10, "bold"), bg="brown", foreground="white", borderwidth=0, 
                     command=lambda: options_menu(window, mgs1_info, mgs2_info, mgs3_info))
+
 options.place(x=878,y=400)
 
 #start the application

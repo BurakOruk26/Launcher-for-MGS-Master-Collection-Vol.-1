@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import filedialog as fd
 from PIL import ImageTk, Image
 import os
 
@@ -10,7 +11,38 @@ def run_game(window, exe_path):
 def enable_game(game_button, button_state):
     game_button["state"] = button_state.get()
 
-def options_menu(window,mgs1_button,mgs2_button,mgs3_button,has_mgs1,has_mgs2,has_mgs3):
+def choose_path(game_path, game_button):
+    path=  fd.askopenfilename(filetypes=[("game executable", ".exe")])
+    
+    # following procedure is done because of Konami has named their exacutables in an amateurish way
+    # since the .exe file name involves blank space the path gets corrupted in console command
+    # hence, in the following code name of the .exe file has been surrounded by double quotes
+
+    last_slash = path.rfind('/')    # find the last blackslash's index, which means that .exe name will proceed afterwards
+    # split it into two parts
+    before_last_slash = path[:last_slash+1]
+    after_last_slash = path[last_slash+1:]
+    # add the needed double quotes before and after the executable name
+    path = before_last_slash + '\"' + after_last_slash + '\"'
+
+    game_path.set( path )
+    game_button["state"] = "normal" # enable the game button
+
+def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
+
+    # fetching the variables from arguments
+    mgs1_button = mgs1_info[0]
+    mgs2_button = mgs2_info[0]
+    mgs3_button = mgs3_info[0]
+
+    has_mgs1 = mgs1_info[1]
+    has_mgs2 = mgs2_info[1]
+    has_mgs3 = mgs3_info[1]
+
+    mgs1_path = mgs1_info[2]
+    mgs2_path = mgs2_info[2]
+    mgs3_path = mgs3_info[2]
+
     popup = tk.Toplevel(window)
     popup.title("choose games and paths to their exe")
     window_width = 400
@@ -29,15 +61,21 @@ def options_menu(window,mgs1_button,mgs2_button,mgs3_button,has_mgs1,has_mgs2,ha
     mgs2_c_button = tk.Checkbutton(popup, text="mgs2", variable=has_mgs2, onvalue="normal", offvalue="disabled", command=lambda: enable_game(mgs2_button,has_mgs2))
     mgs3_c_button = tk.Checkbutton(popup, text="mgs3", variable=has_mgs3, onvalue="normal", offvalue="disabled", command=lambda: enable_game(mgs3_button,has_mgs3))
 
+
+    # initialize buttons for choosing path
+    mgs1_p_button = tk.Button(popup,text="Choose path for MGS1: ", command=lambda: choose_path(mgs1_path, mgs1_button))
+    mgs2_p_button = tk.Button(popup,text="Choose path for MGS2: ", command=lambda: choose_path(mgs2_path, mgs2_button))
+    mgs3_p_button = tk.Button(popup,text="Choose path for MGS3: ", command=lambda: choose_path(mgs3_path, mgs3_button))
+
+
     mgs1_c_button.pack()
     mgs2_c_button.pack()
     mgs3_c_button.pack()
 
-# path variables
-dir_path = os.path.dirname(os.path.realpath(__file__))
-mgs1_path = r'D:\SteamLibrary\steamapps\common\MGS1\"METAL GEAR SOLID.exe"'     # to be changed
-mgs2_path = r'D:\SteamLibrary\steamapps\common\MGS2\"METAL GEAR SOLID2.exe"'    # to be changed
-mgs3_path = r'D:\SteamLibrary\steamapps\common\MGS3\"METAL GEAR SOLID3.exe"'    # to be changed
+    mgs1_p_button.pack()
+    mgs2_p_button.pack()
+    mgs3_p_button.pack()
+
 
 # window initialization
 window = tk.Tk()
@@ -56,6 +94,18 @@ window.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y
 window.resizable(False,False)
 window.config(bg="black")  
 
+# variables
+dir_path = os.path.dirname(os.path.realpath(__file__))
+# variables for checkboxes
+has_mgs1 = tk.StringVar()
+has_mgs2 = tk.StringVar()
+has_mgs3 = tk.StringVar()
+
+# variables for paths
+mgs1_path = tk.StringVar()
+mgs2_path = tk.StringVar()
+mgs3_path = tk.StringVar()
+
 
 # main frame
 frame = tk.Frame(window, width=993, height=427)
@@ -70,30 +120,34 @@ label.pack()
 # buttons for opening the games
 # cover arts of every game has been put into the buttons respectively
 mgs1_img = ImageTk.PhotoImage(Image.open(dir_path + r"\imgs\cover_arts\mgs1.bmp"))
-mgs1_button = tk.Button(window, image=mgs1_img, borderwidth=0, bg="gold", command=lambda: run_game(window, mgs1_path))
+mgs1_button = tk.Button(window, image=mgs1_img, borderwidth=0, bg="gold", command=lambda: run_game(window, mgs1_path.get()))
 mgs1_button.place(x=23,y=14)
 
 mgs2_img = ImageTk.PhotoImage(Image.open(dir_path + r"\imgs\cover_arts\mgs2.bmp"))
-mgs2_button = tk.Button(window, image=mgs2_img, borderwidth=0, bg="gold", command=lambda: run_game(window, mgs2_path))
+mgs2_button = tk.Button(window, image=mgs2_img, borderwidth=0, bg="gold", command=lambda: run_game(window, mgs2_path.get()))
 mgs2_button.place(x=348,y=14)
 
 mgs3_img = ImageTk.PhotoImage(Image.open(dir_path + r"\imgs\cover_arts\mgs3.bmp"))
-mgs3_button = tk.Button(window, image=mgs3_img, borderwidth=0, bg="gold", command=lambda: run_game(window, mgs3_path))
+mgs3_button = tk.Button(window, image=mgs3_img, borderwidth=0, bg="gold", command=lambda: run_game(window, mgs3_path.get()))
 mgs3_button.place(x=677,y=14)
+
+# disable the buttons if game paths haven't been initialized
+if mgs1_path.get() == "": mgs1_button["state"] = "disabled"
+if mgs2_path.get() == "": mgs2_button["state"] = "disabled"
+if mgs3_path.get() == "": mgs3_button["state"] = "disabled"
+
 
 # button for exiting the application
 close_button = tk.Button(window,text="EXIT", font=("Helvatica", 10, "bold"), bg="brown", foreground="white", borderwidth=0, command=lambda: window.destroy())
 close_button.place(x=950,y=400)
 
-
-# variables for checkboxes
-has_mgs1 = tk.StringVar()
-has_mgs2 = tk.StringVar()
-has_mgs3 = tk.StringVar()
+mgs1_info = [mgs1_button, has_mgs1, mgs1_path]
+mgs2_info = [mgs2_button, has_mgs2, mgs2_path]
+mgs3_info = [mgs3_button, has_mgs3, mgs3_path]
 
 # button for selecting directories for the games
 options = tk.Button(window,text="OPTIONS", font=("Helvatica", 10, "bold"), bg="brown", foreground="white", borderwidth=0, 
-                    command=lambda: options_menu(window,mgs1_button,mgs2_button,mgs3_button,has_mgs1,has_mgs2,has_mgs3))
+                    command=lambda: options_menu(window, mgs1_info, mgs2_info, mgs3_info))
 options.place(x=878,y=400)
 
 #start the application

@@ -47,6 +47,8 @@ def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
     mgs2_path = mgs2_info[2]
     mgs3_path = mgs3_info[2]
 
+
+    # initialize a pop-up screen
     popup = tk.Toplevel(window)
     popup.title("choose games and paths to their exe")
     window_width = 600
@@ -57,33 +59,50 @@ def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
     y_cordinate = int((screen_height/2) - (window_height/2))
     popup.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y_cordinate))
     popup.resizable(False,False)
-    popup.config(bg="grey")
+    popup.config(bg="#2F4F4F")
 
 
     # initialize check buttons
-    mgs1_c_button = tk.Checkbutton(popup, text="MGS1", variable=has_mgs1, onvalue="normal", offvalue="disabled", 
+    mgs1_c_button = tk.Checkbutton(popup, bg="#8B2323", variable=has_mgs1, onvalue="normal", offvalue="disabled", 
                                    command=lambda: enable_game(mgs1_button,has_mgs1))
     
-    mgs2_c_button = tk.Checkbutton(popup, text="MGS2", variable=has_mgs2, onvalue="normal", offvalue="disabled", 
+    mgs2_c_button = tk.Checkbutton(popup, bg="#3D58AB", variable=has_mgs2, onvalue="normal", offvalue="disabled", 
                                    command=lambda: enable_game(mgs2_button,has_mgs2))
     
-    mgs3_c_button = tk.Checkbutton(popup, text="MGS3", variable=has_mgs3, onvalue="normal", offvalue="disabled", 
+    mgs3_c_button = tk.Checkbutton(popup, bg="#458B00", variable=has_mgs3, onvalue="normal", offvalue="disabled", 
                                    command=lambda: enable_game(mgs3_button,has_mgs3))
 
 
     # initialize buttons for choosing path
-    mgs1_p_button = tk.Button(popup,text="Choose path for MGS1: ", command=lambda: choose_path(mgs1_path, mgs1_button))
-    mgs2_p_button = tk.Button(popup,text="Choose path for MGS2: ", command=lambda: choose_path(mgs2_path, mgs2_button))
-    mgs3_p_button = tk.Button(popup,text="Choose path for MGS3: ", command=lambda: choose_path(mgs3_path, mgs3_button))
+    mgs1_p_button = tk.Button(popup,text="Click to choose path for MGS1: ", bg="#8B2323", fg="white", font=("Helvatica", 8, "bold"),
+                              command=lambda: choose_path(mgs1_path, mgs1_button))
+    
+    mgs2_p_button = tk.Button(popup,text="Click to choose path for MGS2: ", bg="#3D58AB", fg="white", font=("Helvatica", 8, "bold"),
+                              command=lambda: choose_path(mgs2_path, mgs2_button))
+    
+    mgs3_p_button = tk.Button(popup,text="Click to choose path for MGS3: ", bg="#458B00", fg="white", font=("Helvatica", 8, "bold"),
+                              command=lambda: choose_path(mgs3_path, mgs3_button))
 
+
+    # initialize labels for showing current path
+    mgs1_p_label = tk.Label(popup, font=("Helvatica", 8, "italic"), fg="red", text=mgs1_path.get())
+    mgs2_p_label = tk.Label(popup, font=("Helvatica", 8, "italic"), fg="red", text=mgs2_path.get())
+    mgs3_p_label = tk.Label(popup, font=("Helvatica", 8, "italic"), fg="red", text=mgs3_path.get())
+
+
+    # place the widgets on the pop-up
 
     mgs1_c_button.place(x=5, y=5)
     mgs2_c_button.place(x=5, y=30)
     mgs3_c_button.place(x=5,y=55)
 
-    mgs1_p_button.place(x=70,y=5)
-    mgs2_p_button.place(x=70,y=30)
-    mgs3_p_button.place(x=70,y=55)
+    mgs1_p_button.place(x=30,y=5)
+    mgs2_p_button.place(x=30,y=30)
+    mgs3_p_button.place(x=30,y=55)
+
+    mgs1_p_label.place(x=220,y=7)
+    mgs2_p_label.place(x=220,y=32)
+    mgs3_p_label.place(x=220,y=57)
 
 
 # window initialization

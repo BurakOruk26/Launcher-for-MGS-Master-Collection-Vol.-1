@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog as fd
 from PIL import ImageTk, Image
 import os
+import json
 
 # following method runs the exacutable provided at the exe_path
 def run_game(window, exe_path):
@@ -14,18 +15,26 @@ def run_game(window, exe_path):
 def enable_game(game_button, button_state):
     game_button["state"] = button_state.get()
 
-##################################
 
-###      ADD PATH SAVING       ###
-
-##################################
-
-def set_game_path(game_path_var, game_path, game_button, has_game):
-    game_path_var.set( game_path )
+def set_game_path(paths, game_path, game_button, has_game, selected_game, savefile):
     game_button["state"] = "normal" # enable the game button
     has_game.set("normal")
+    paths[selected_game].set( game_path )
+    
+    # save paths to json
+    path_strings = {
+        "mgs1": paths["mgs1"].get(),
+        "mgs2": paths["mgs2"].get(),
+        "mgs3": paths["mgs3"].get()
+    }
+    # erase the previous savefile.json contens
+    savefile.truncate(0)
+    savefile.seek(0)
+    # write new contents
+    json.dump(path_strings, savefile)
 
-def choose_path(game_path_var, game_button, has_game, selection_popup):
+
+def choose_path(paths, game_button, has_game, selection_popup, selected_game, savefile):
     path=  fd.askopenfilename(filetypes=[("game executable", ".exe")])
     
     # following procedure is done because of Konami has named their exacutables in an amateurish way
@@ -39,11 +48,11 @@ def choose_path(game_path_var, game_button, has_game, selection_popup):
     # add the needed double quotes before and after the executable name
     path = before_last_slash + '\"' + after_last_slash + '\"'
 
-    set_game_path(game_path_var, path, game_button, has_game)
+    set_game_path(paths, path, game_button, has_game, selected_game, savefile)
 
     selection_popup.destroy()
 
-def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
+def options_menu(window, mgs1_info, mgs2_info, mgs3_info, paths, savefile):
 
     #   fetching the variables from arguments
 
@@ -87,13 +96,13 @@ def options_menu(window, mgs1_info, mgs2_info, mgs3_info):
 
     # initialize buttons for choosing path
     mgs1_p_button = tk.Button(popup,text="Click to choose path for MGS1: ", bg="#8B2323", fg="white", font=("Helvatica", 8, "bold"),
-                              command=lambda: choose_path(mgs1_path, mgs1_button, has_mgs1, popup))
+                              command=lambda: choose_path(paths, mgs1_button, has_mgs1, popup, "mgs1", savefile))
     
     mgs2_p_button = tk.Button(popup,text="Click to choose path for MGS2: ", bg="#3D58AB", fg="white", font=("Helvatica", 8, "bold"),
-                              command=lambda: choose_path(mgs2_path, mgs2_button, has_mgs2, popup))
+                              command=lambda: choose_path(paths, mgs2_button, has_mgs2, popup, "mgs2", savefile))
     
     mgs3_p_button = tk.Button(popup,text="Click to choose path for MGS3: ", bg="#458B00", fg="white", font=("Helvatica", 8, "bold"),
-                              command=lambda: choose_path(mgs3_path, mgs3_button, has_mgs3, popup))
+                              command=lambda: choose_path(paths, mgs3_button, has_mgs3, popup, "mgs3", savefile))
 
 
     # initialize labels for showing current path
@@ -147,6 +156,46 @@ mgs2_path = tk.StringVar()
 mgs3_path = tk.StringVar()
 
 
+#   read saved paths from paths.json
+
+# open savefile.json
+# create savefile.json, if doesn't exist
+try: 
+    savefile = open( dir_path + "/savefile.json", "r+")
+except:
+    savefile = open( dir_path + "/savefile.json", "a+", encoding="UTF8" )
+    savefile.close()
+finally:
+    savefile = open( dir_path + "/savefile.json", "r+")
+
+# read the file
+try:
+    savedpaths = json.load(savefile) 
+except:
+    savedpaths = {
+    "mgs1": "",
+    "mgs2": "",
+    "mgs3": ""
+}
+
+# update checkbuttons according to path info
+has_game = [has_mgs1,has_mgs2,has_mgs3]   
+for path, has_game in zip(savedpaths, has_game):
+    if not savedpaths[path] == "":  has_game.set("normal")
+    else:               has_game.set("disable")
+    
+# set saved paths to variables
+mgs1_path.set(savedpaths["mgs1"])
+mgs2_path.set(savedpaths["mgs2"])
+mgs3_path.set(savedpaths["mgs3"])
+
+paths = {
+    "mgs1": mgs1_path,
+    "mgs2": mgs2_path,
+    "mgs3": mgs3_path
+}
+
+
 # main frame
 frame = tk.Frame(window, width=993, height=427)
 frame.pack()
@@ -189,7 +238,7 @@ mgs3_info = [mgs3_button, has_mgs3, mgs3_path]
 
 # button for selecting directories for the games
 options = tk.Button(window,text="OPTIONS", font=("Helvatica", 10, "bold"), bg="brown", foreground="white", borderwidth=0, 
-                    command=lambda: options_menu(window, mgs1_info, mgs2_info, mgs3_info))
+                    command=lambda: options_menu(window, mgs1_info, mgs2_info, mgs3_info, paths, savefile))
 
 options.place(x=878,y=400)
 
